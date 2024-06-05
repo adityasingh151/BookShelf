@@ -1,42 +1,48 @@
-// src/components/BookSearch.js
-import React, { useState, useCallback } from 'react';
-import axios from 'axios';
+import React, { useState, useCallback, useEffect } from 'react';
 import BookCard from './BookCard';
-import debounce from 'lodash/debounce';
+import axios from 'axios';
 
-const BookSearch = ({ onAdd }) => {
+const BookSearch = ({ addToBookshelf }) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
 
-  const fetchBooks = async (query) => {
+  const fetchBooks = useCallback(async () => {
     if (query.length > 2) {
-      const response = await axios.get(`https://openlibrary.org/search.json?q=${query}&limit=10&page=1`);
-      setResults(response.data.docs);
-    } else {
-      setResults([]);
+      try {
+        const response = await axios.get(
+          `https://openlibrary.org/search.json?q=${query}&limit=10&page=1`
+        );
+        setResults(response.data.docs);
+      } catch (error) {
+        console.error('Error fetching books:', error);
+      }
     }
-  };
+  }, [query]);
 
-  const debouncedFetchBooks = useCallback(debounce(fetchBooks, 300), []);
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      fetchBooks();
+    }, 300);
 
-  const handleSearch = (e) => {
-    const query = e.target.value;
-    setQuery(query);
-    debouncedFetchBooks(query);
-  };
+    return () => clearTimeout(delayDebounceFn);
+  }, [query, fetchBooks]);
 
   return (
-    <div>
+    <div className="container mx-auto p-4">
       <input
         type="text"
         value={query}
-        onChange={handleSearch}
+        onChange={(e) => setQuery(e.target.value)}
         placeholder="Search for books..."
-        className="w-full p-2 border rounded-lg mb-4"
+        className="w-full p-2 border border-gray-300 rounded-md mb-4"
       />
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {results.map((book) => (
-          <BookCard key={book.key} book={book} onAdd={onAdd} />
+          <BookCard
+            key={book.key}
+            book={book}
+            addToBookshelf={addToBookshelf}
+          />
         ))}
       </div>
     </div>
