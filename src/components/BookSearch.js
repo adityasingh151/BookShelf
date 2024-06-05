@@ -41,7 +41,7 @@ const BookSearch = ({ addToBookshelf }) => {
           <BookCard
             key={book.key}
             book={book}
-            addToBookshelf={addToBookshelf}
+            onAdd={addToBookshelf}
           />
         ))}
       </div>
