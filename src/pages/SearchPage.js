@@ -1,5 +1,5 @@
 // src/pages/SearchPage.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import BookCard from '../components/BookCard';
 import axios from 'axios';
 
@@ -7,7 +7,7 @@ const SearchPage = ({ onAddToBookshelf }) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
 
-  const fetchBooks = async () => {
+  const fetchBooks = useCallback(async () => {
     if (query.length > 2) {
       try {
         const response = await axios.get(
@@ -18,7 +18,7 @@ const SearchPage = ({ onAddToBookshelf }) => {
         console.error('Error fetching books:', error);
       }
     }
-  };
+  }, [query]);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -26,7 +26,7 @@ const SearchPage = ({ onAddToBookshelf }) => {
     }, 300);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [query, fetchBooks]); // Add fetchBooks to the dependency array
+  }, [query, fetchBooks]);
 
   return (
     <div className="container mx-auto p-4">
