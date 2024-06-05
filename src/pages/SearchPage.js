@@ -26,7 +26,7 @@ const SearchPage = ({ onAddToBookshelf }) => {
     }, 300);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [query]);
+  }, [query, fetchBooks]); // Add fetchBooks to the dependency array
 
   return (
     <div className="container mx-auto p-4">
@@ -42,7 +42,7 @@ const SearchPage = ({ onAddToBookshelf }) => {
           <BookCard
             key={book.key}
             book={book}
-            onAddToBookshelf={onAddToBookshelf} // Pass onAddToBookshelf here
+            onAddToBookshelf={onAddToBookshelf}
           />
         ))}
       </div>
